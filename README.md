@@ -1,6 +1,24 @@
 # ThreeLib
 .net Class Library written in c# for creating [Three.js](https://github.com/mrdoob/three.js) compatible objects.
 
+DIFFERENCE FROM ORIGINAL VERSION:
+1) removed redundant collection classes (used single ElementCollection)
+2) optimized classes hierarchy (geometry should'not be derived from Obj3d, IEnumerable interface used widely etc)
+3) removed unnecessary serialization adapters
+4) fixed complex object children serialization (bug #33 in original issue tracker)
+5) refined hashcode combining (no simple XORs)
+6) refined equality methods (referenceequals used etc.)
+7) separated buffer geometry type implementations from simple ones
+8) added font support
+9) added new enums (for material and more)
+10) added defaultUp and initial object rotation (lookAt)
+11) added more vector math functions/properties
+12) added textgeometry
+13) refined serialization configuration
+14) optimized (reimplemented) weird parts... (like unnecessary reflection usage, re-casting etc.)
+and more
+TESTED FROM 2 YEARS IN BIG REAL PROJECT!
+
 [![Build status](https://ci.appveyor.com/api/projects/status/7bh8wx2e74b6krrd?svg=true)](https://ci.appveyor.com/project/fraguada/ThreeLib)
 
 The scope of this project is focused on serialization (and later perhaps deserialization). Therefore the objects to be targeted should be those that can be read through one of the Three.js [Loaders](https://github.com/mrdoob/three.js/tree/master/src/loaders).
