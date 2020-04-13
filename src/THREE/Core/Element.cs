@@ -1,92 +1,69 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Collections.ObjectModel;
-using System.Linq;
+﻿using Newtonsoft.Json;
+using System;
+using THREE.Serialization;
 
 namespace THREE.Core
 {
+	public interface IElement
+	{
+		Guid Uuid { get; set; }
 
-    public interface IElement { }
+		string Name { get; set; }
 
-    /// <summary>
-    /// Base class for objects which have a Uuid, Name, and Type.
-    /// </summary>
-    public class Element : IElement, IEquatable<Element>
-    {
-        /// <summary>
-        /// Unique Guid.
-        /// </summary>
-        public Guid Uuid { get; set; }
+		//string Type { get; set; }
 
-        /// <summary>
-        /// Name.
-        /// </summary>
-        public string Name { get; set; }
+		//IElement Copy(IElement other);
 
-        /// <summary>
-        /// Type of object.
-        /// </summary>
-        public string Type { get; set; }
+		//IElement Clone();
 
-        /// <summary>
-        /// Default Constructor.
-        /// </summary>
-        public Element()
-        {
-            Uuid = Guid.NewGuid();
-            Type = GetType().Name;
-        }
+		//string ToJSON();
+	}
 
-        //public bool Equals(Element other)
-        //{
-        //    if (other.GetType() == typeof(Element)) return base.Equals(other);
-        //    else return false;
-        //}
+	/// <summary>
+	/// Base class for objects which have a Uuid, Name, and Type.
+	/// </summary>
+	public class Element : IElement
+	{
+		/// <summary>
+		/// Unique Guid.
+		/// </summary>		
+		public Guid Uuid { get; set; }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        /// <param name="other"></param>
-        /// <returns></returns>
-        public bool Equals(Element other)
-        {
-            if (other == null) return false;
-            else
-                return Name.Equals(other.Name) &&
-                       Type.Equals(other.Type);
-        }
-    }
+		/// <summary>
+		/// Name.
+		/// </summary>		
+		public string Name { get; set; }
 
-    public class ElementCollection : Collection<Element>
-    {
+		/// <summary>
+		/// Type of object.
+		/// </summary>		
+		public string Type { get; set; }
 
-        public void AddRange(IEnumerable<Element> elements)
-        {
-            foreach (var element in elements)
-                Add(element);
-        }
+		/// <summary>
+		/// Default Constructor.
+		/// </summary>
+		public Element()
+		{
+			Uuid = Guid.NewGuid();
+			Type = GetType().Name;
+		}		
 
-        /// <summary>
-        /// Add a geometry to this collection if it does not already exist.
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        public Guid AddIfNew(Element item)
-        {
-            var q = from a in this
-                    where a.Equals(item)
-                    select a.Uuid;
+		/// <summary>
+		/// Convert the object to JSON format. 
+		/// </summary>
+		/// <returns>A string representation of this object, serialized to JSON.</returns>
+		/// <returns>JSON String.</returns>
+		public virtual string ToJSON(bool format)
+		{
+			var serializerSettings = new JsonSerializerSettings
+			{
+				Formatting = format ? Formatting.Indented : Formatting.None,
+				DefaultValueHandling = DefaultValueHandling.Ignore,
+				NullValueHandling = NullValueHandling.Ignore,
+				ContractResolver = new CamelCaseCustomResolver()
+			};
 
-            var enumerable = q as Guid[] ?? q.ToArray();
-            if (!enumerable.Any())
-            {
-                Add(item);
-                return item.Uuid;
-            }
-            else
-            {
-                return enumerable.Single();
-            }
-        }
-    }
+			return JsonConvert.SerializeObject(this, serializerSettings);
+		}
+	}
 }

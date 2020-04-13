@@ -8,7 +8,7 @@ namespace THREE.Objects
 	/// <summary>
 	/// 
 	/// </summary>
-	public class Points : Object3D, IGeometryContainer
+	public class LineSegments : Object3D, IGeometryContainer
 	{
 		/// <summary>
 		/// The geometry associated with this Mesh.
@@ -33,5 +33,13 @@ namespace THREE.Objects
 		/// </summary>
 		[JsonProperty("material")]
 		public Guid MaterialUuid { get { return (Material as Material).Uuid; } }
+
+		/// <summary>
+		/// 
+		/// </summary>
+		public LineSegments()
+		{
+			Type = GetType().Name;
+		}
 	}
 }

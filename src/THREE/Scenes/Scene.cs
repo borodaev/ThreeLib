@@ -1,104 +1,104 @@
 ﻿using Newtonsoft.Json;
-using Newtonsoft.Json.Serialization;
 using THREE.Core;
 using THREE.Serialization;
 using THREE.Utility;
 
 namespace THREE
 {
-    /// <summary>
-    /// Scenes allow you to set up what and where is to be rendered by three.js. This is where you place objects, lights and cameras.
-    /// <para>Analogous to https://threejs.org/docs/index.html#api/scenes/Scene </para>
-    /// <para>JS Source: https://github.com/mrdoob/three.js/blob/master/src/scenes/Scene.js</para>
-    /// </summary>
-    /// <example>
-    /// Create a new Scene and set the Background Color and Name.
-    /// <code>
-    /// var scene = new Scene
-    /// {
-    ///     Background = new  Color(255,0,255).ToInt(),
-    ///     Name = "My Scene"
-    /// };
-    /// </code>
-    /// </example>
-    public class Scene : Object3D
-    {
+	/// <summary>
+	/// Scenes allow you to set up what and where is to be rendered by three.js. This is where you place objects, lights and cameras.
+	/// <para>Analogous to https://threejs.org/docs/index.html#api/scenes/Scene </para>
+	/// <para>JS Source: https://github.com/mrdoob/three.js/blob/master/src/scenes/Scene.js</para>
+	/// </summary>
+	/// <example>
+	/// Create a new Scene and set the Background Color and Name.
+	/// <code>
+	/// var scene = new Scene
+	/// {
+	///     Background = new  Color(255,0,255).ToInt(),
+	///     Name = "My Scene"
+	/// };
+	/// </code>
+	/// </example>
+	public class Scene : Object3D
+	{
+		#region Properties
 
-        #region Properties
+		/// <summary>
+		/// Background color for the scene.
+		/// </summary>		
+		public int Background { get; set; }
 
-        /// <summary>
-        /// Background color for the scene.
-        /// </summary>
-        public int Background { get; set; }
+		/// <summary>
+		/// 
+		/// </summary>
+		[JsonIgnore]
+		internal new SceneSerializationAdapter SerializationAdapter { get; set; }
 
-        [JsonIgnore]
-        internal new SceneSerializationAdaptor SerializationAdaptor { get; set; }
+		#endregion
 
-        #endregion
+		#region Methods
 
-        #region Methods
+		/// <summary>
+		/// Converts this Scene to a compatible JSON format.
+		/// </summary>
+		/// <returns>JSON String.</returns>
+		public override string ToJSON(bool format)
+		{
+			base.SerializationAdapter = new Object3DSerializationAdapter();
 
-        /// <summary>
-        /// Converts this Scene to a compatible JSON format.
-        /// </summary>
-        /// <returns>JSON String.</returns>
-        public override string ToJSON(bool format)
-        {
-            base.SerializationAdaptor = new Object3DSerializationAdaptor();
+			ProcessChildren();
 
-            ProcessChildren();
+			SerializationAdapter = new SceneSerializationAdapter();
+			SerializationAdapter.Object.Name = Name;
+			SerializationAdapter.Object.Background = Background;
+			SerializationAdapter.Object.UserData = UserData;
+			SerializationAdapter.Geometries.AddRange(base.SerializationAdapter.Geometries);			
+			SerializationAdapter.Images = base.SerializationAdapter.Images;
+			SerializationAdapter.Textures = base.SerializationAdapter.Textures;
+			SerializationAdapter.Materials = base.SerializationAdapter.Materials;
+			SerializationAdapter.Fonts = base.SerializationAdapter.Fonts;
+			SerializationAdapter.Object.Children = base.SerializationAdapter.Object.Children;
 
-            SerializationAdaptor = new SceneSerializationAdaptor();
-            SerializationAdaptor.Object.Name = Name;
-            SerializationAdaptor.Object.Background = Background;
-            SerializationAdaptor.Object.UserData = UserData;
-            SerializationAdaptor.Elements.AddRange(base.SerializationAdaptor.Geometries);
-            SerializationAdaptor.Elements.AddRange(base.SerializationAdaptor.BufferGeometries);
-            SerializationAdaptor.Images = base.SerializationAdaptor.Images;
-            SerializationAdaptor.Textures = base.SerializationAdaptor.Textures;
-            SerializationAdaptor.Materials = base.SerializationAdaptor.Materials;
-            SerializationAdaptor.Object.Children = base.SerializationAdaptor.Object.Children;
+			var serializerSettings = new JsonSerializerSettings
+			{
+				Formatting = format == true ? Formatting.Indented : Formatting.None,
+				DefaultValueHandling = DefaultValueHandling.Ignore,
+				NullValueHandling = NullValueHandling.Ignore,
+				ContractResolver = new CamelCaseCustomResolver()
+			};
 
-            var serializerSettings = new JsonSerializerSettings
-            {
-                Formatting = format == true ? Formatting.Indented : Formatting.None,
-                DefaultValueHandling = DefaultValueHandling.Ignore,
-                NullValueHandling = NullValueHandling.Ignore,
-                ContractResolver = new CamelCaseCustomResolver()
-            };
+			return JsonConvert.SerializeObject(SerializationAdapter, serializerSettings);
+		}
 
-            return JsonConvert.SerializeObject(SerializationAdaptor, serializerSettings);
-        }
+		#endregion
 
-        #endregion
+	}
+	/// <summary>
+	/// Internal class to format Scene object for the Three.js Object Scene Format:
+	/// https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4
+	/// </summary>
+	internal class SceneSerializationAdapter : ObjectSerializationAdapter
+	{
+		[JsonProperty("object", Order = 5)]
+		internal SceneObject Object { get; set; }
 
-    }
-    /// <summary>
-    /// Internal class to format Scene object for the Three.js Object Scene Format:
-    /// https://github.com/mrdoob/three.js/wiki/JSON-Object-Scene-format-4
-    /// </summary>
-    internal class SceneSerializationAdaptor : ObjectSerializationAdaptor
-    {
+		/// <summary>
+		/// Default constructor.
+		/// </summary>
+		internal SceneSerializationAdapter()
+		{
+			Object = new SceneObject()
+			{
+				Type = "Scene"
+			};
+			Metadata.Generator = "ThreeLib-Object3D.toJSON";
+		}
 
-        [JsonProperty(Order = 5)]
-        internal SceneObject Object { get; set; }
-
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        internal SceneSerializationAdaptor()
-        {
-            Object = new SceneObject()
-            {
-                Type = "Scene"
-            };
-            Metadata.Generator = "ThreeLib-Object3D.toJSON";
-        }
-
-        internal class SceneObject : Object3D
-        {
-            public int Background { get; set; }
-        }
-    }
-
+		internal class SceneObject : Object3D
+		{
+			[JsonProperty("background")]
+			public int Background { get; set; }
+		}
+	}
 }

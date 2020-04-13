@@ -5,41 +5,40 @@ using THREE.Materials;
 
 namespace THREE.Objects
 {
-    /// <summary>
-    /// 
-    /// </summary>
-    public class Line : Object3D
-    {
-        /// <summary>
-        /// The geometry associated with this Mesh.
-        /// </summary>
-        [JsonIgnore]
-        public IGeometry Geometry { get; set; }
+	/// <summary>
+	/// 
+	/// </summary>
+	public class Line : Object3D, IGeometryContainer
+	{
+		/// <summary>
+		/// The geometry associated with this Mesh.
+		/// </summary>
+		[JsonIgnore]
+		public IGeometry Geometry { get; set; }
 
-        /// <summary>
-        /// Uuid of this geometry.
-        /// </summary>
-        [JsonProperty("geometry")]
-        public Guid GeometryUuid { get { return (Geometry as Geometry).Uuid; } }
+		/// <summary>
+		/// Uuid of this geometry.
+		/// </summary>
+		[JsonProperty("geometry")]
+		public Guid GeometryUuid { get { return Geometry.Uuid; } }
 
-        /// <summary>
-        /// The material associated with this mesh.
-        /// </summary>
-        [JsonIgnore]
-        public IMaterial Material { get; set; }
+		/// <summary>
+		/// The material associated with this mesh.
+		/// </summary>
+		[JsonIgnore]
+		public IMaterial Material { get; set; }
 
-        /// <summary>
-        /// This object's material Uuid.
-        /// </summary>
-        [JsonProperty("material")]
-        public Guid MaterialUuid { get { return (Material as Material).Uuid; } }
+		/// <summary>
+		/// This object's material Uuid.
+		/// </summary>
+		[JsonProperty("material")]
+		public Guid MaterialUuid { get { return (Material as Material).Uuid; } }
 
-        /// <summary>
-        /// 
-        /// </summary>
-        public Line()
-        {
-            Type = GetType().Name;
-        }
-    }
+		/// <summary>
+		/// 
+		/// </summary>
+		public Line()
+		{
+		}
+	}
 }

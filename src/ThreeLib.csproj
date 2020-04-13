@@ -24,6 +24,7 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Debug\ThreeLib.xml</DocumentationFile>
+    <NoWarn>CS1591</NoWarn>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|AnyCPU' ">
     <DebugType>pdbonly</DebugType>
@@ -34,7 +35,31 @@
     <WarningLevel>4</WarningLevel>
     <DocumentationFile>bin\Release\ThreeLib.xml</DocumentationFile>
   </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Debug|x64'">
+    <DebugSymbols>true</DebugSymbols>
+    <OutputPath>bin\x64\Debug\</OutputPath>
+    <DefineConstants>DEBUG;TRACE</DefineConstants>
+    <DocumentationFile>bin\Debug\ThreeLib.xml</DocumentationFile>
+    <NoWarn>CS1591</NoWarn>
+    <DebugType>full</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|x64'">
+    <OutputPath>bin\x64\Release\</OutputPath>
+    <DefineConstants>TRACE</DefineConstants>
+    <DocumentationFile>bin\Release\ThreeLib.xml</DocumentationFile>
+    <Optimize>true</Optimize>
+    <DebugType>pdbonly</DebugType>
+    <PlatformTarget>x64</PlatformTarget>
+    <ErrorReport>prompt</ErrorReport>
+    <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+  </PropertyGroup>
   <ItemGroup>
+    <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.3\lib\net45\Newtonsoft.Json.dll</HintPath>
+    </Reference>
     <Reference Include="System" />
   </ItemGroup>
   <ItemGroup>
@@ -43,7 +68,10 @@
     <Compile Include="THREE\Cameras\PerspectiveCamera.cs" />
     <Compile Include="THREE\Core\BufferAttribute.cs" />
     <Compile Include="THREE\Core\BufferGeometry.cs" />
+    <Compile Include="THREE\Core\ElementCollection.cs" />
+    <Compile Include="THREE\Core\Font.cs" />
     <Compile Include="THREE\Core\Element.cs" />
+    <Compile Include="THREE\Geometries\TextGeometry.cs" />
     <Compile Include="THREE\Geometries\SphereGeometry.cs" />
     <Compile Include="THREE\Lights\AmbientLight.cs" />
     <Compile Include="THREE\Lights\DirectionalLight.cs" />
@@ -70,6 +98,7 @@
     <Compile Include="THREE\Core\IGeometry.cs" />
     <Compile Include="THREE\Core\Geometry.cs" />
     <Compile Include="THREE\Objects\Group.cs" />
+    <Compile Include="THREE\Objects\LineSegments.cs" />
     <Compile Include="THREE\Objects\Line.cs" />
     <Compile Include="THREE\Materials\Material.cs" />
     <Compile Include="THREE\Objects\Mesh.cs" />
@@ -85,9 +114,7 @@
     <Compile Include="THREE\Utility\Utilities.cs" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="Newtonsoft.Json">
-      <Version>10.0.3</Version>
-    </PackageReference>
+    <None Include="packages.config" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>

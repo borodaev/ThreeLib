@@ -2,134 +2,166 @@
 using System;
 using System.Collections.ObjectModel;
 using System.Linq;
+using THREE.Core;
+using THREE.Utility;
 
 namespace THREE.Textures
 {
+	/// <summary>
+	/// 
+	/// </summary>
+	public interface ITexture : IElement
+	{
+	}
 
-    public class Texture : IEquatable<Texture>
-    {
+	/// <summary>
+	/// 
+	/// </summary>
+	public class Texture : ITexture, IEquatable<Texture>
+	{
+		#region Properties
 
-        #region Properties
+		/// <summary>
+		/// Object Id.
+		/// </summary>
+		public Guid Uuid { get; set; }
 
-        /// <summary>
-        /// Object Id.
-        /// </summary>
-        public Guid Uuid { get; set; }
+		/// <summary>
+		/// 
+		/// </summary>
+		public string Name { get; set; }
 
-        /// <summary>
-        /// Image associated with this texture.
-        /// </summary>
-        [JsonIgnore]
-        public Image Image { get; set; }
+		//public int Type { get; set; }
+		// add texture enums
+		// see https://threejs.org/docs/#api/en/constants/Textures
 
-        /// <summary>
-        /// URL of the image.
-        /// </summary>
-        [JsonProperty("image")]
-        public Guid? ImageUuid
-        {
-            get
-            {
-                if (Image != null)
-                    return Image.Uuid;
-                else return null;
-            }
-            
-        }
+		/// <summary>
+		/// Image associated with this texture.
+		/// </summary>
+		[JsonIgnore]
+		public Image Image { get; set; }
 
-        /// <summary>
-        /// Texture mapping.
-        /// </summary>
-        public int Mapping { get; set; }
+		/// <summary>
+		/// URL of the image.
+		/// </summary>
+		[JsonProperty("image")]
+		public Guid? ImageUuid
+		{
+			get
+			{
+				if (Image != null)
+				{
+					return Image.Uuid;
+				}
+				else
+				{
+					return null;
+				}
+			}
 
-        /// <summary>
-        /// Texture wrapping.
-        /// </summary>
-        public int[] Wrap { get; set; }
+		}
 
-        /// <summary>
-        /// Texture repetition.
-        /// </summary>
-        public float[] Repeat { get; set; }
+		/// <summary>
+		/// Texture mapping.
+		/// </summary>
+		public int Mapping { get; set; }
 
-        #endregion
+		/// <summary>
+		/// Texture wrapping.
+		/// </summary>
+		public int[] Wrap { get; set; }
 
-        #region Constructors
+		/// <summary>
+		/// Texture repetition.
+		/// </summary>
+		public float[] Repeat { get; set; }
 
-        /// <summary>
-        /// Default constructor.
-        /// </summary>
-        public Texture()
-        {
-            Uuid = Guid.NewGuid();
-        }
+		#endregion
 
-        #endregion
+		#region Constructors
 
-        #region Methods
+		/// <summary>
+		/// Default constructor.
+		/// </summary>
+		public Texture()
+		{
+			Uuid = Guid.NewGuid();
+		}
 
-        public bool Equals(Texture other)
-        {
-            if (other == null) return false;
-            else return Mapping.Equals(other.Mapping) &&
-                        Repeat.SequenceEqual(other.Repeat) &&
-                        Wrap.SequenceEqual(other.Wrap) &&
-                        Image.Equals(other.Image);
-        }
+		#endregion
 
-        public override int GetHashCode()
-        {
-            return Mapping.GetHashCode() ^ Repeat.GetHashCode() ^ Wrap.GetHashCode() ^ Image.GetHashCode();
-        }
+		#region Methods
 
-        public override bool Equals(object other)
-        {
-            if (other.GetType() == typeof(Texture)) return Equals((Texture)other) && base.Equals(other);
-            else return false;
-        }
+		public bool Equals(Texture other)
+		{
+			if (other == null)
+			{
+				return false;
+			}
+			else
+			{
+				return Mapping.Equals(other.Mapping) &&
+						Repeat.SequenceEqual(other.Repeat) &&
+						Wrap.SequenceEqual(other.Wrap) &&
+						Image.Equals(other.Image);
+			}
+		}
 
-        public static bool operator ==(Texture a, Texture b)
-        {
-            bool ba = ReferenceEquals(null, a);
-            bool bb = ReferenceEquals(null, b);
-            if (ba & bb) return true; //they are both null, thus are equal
-            else if (!ba & !bb) return a.Equals(b); //they are both not null, check their contents
-            else return false; //one of them is null, thus they are not equal
-        }
+		public override int GetHashCode()
+		{
+			return Utilities.CombineHashCodes(Mapping, Repeat, Wrap, Image);
+		}
 
-        public static bool operator !=(Texture a, Texture b)
-        {
-            return !(a == b);
-        }
+		public override bool Equals(object other)
+		{
+			//return Equals(other as Texture);
+			if (other.GetType() == typeof(Texture))
+			{
+				return Equals((Texture)other) && base.Equals(other);
+			}
+			else
+			{
+				return false;
+			}
+		}
 
-        #endregion
+		/// <summary>
+		/// Override the == operator.
+		/// </summary>
+		/// <param name="a">The first texture.</param>
+		/// <param name="b">The second texture.</param>
+		/// <returns>True if textures are equal, false if not.</returns>
+		public static bool operator == (Texture a, Texture b)
+		{
+			bool aIsNull = ReferenceEquals(a, null);
+			bool bIsNull = ReferenceEquals(b, null);
+			if (aIsNull & bIsNull)
+			{
+				return true;
+			}
+			if (aIsNull)
+			{
+				return false;
+			}
+			if (bIsNull)
+			{
+				return false;
+			}
+			return a.Equals(b);
+		}
 
-    }
+		/// <summary>
+		/// Override the != operator.
+		/// </summary>
+		/// <param name="a">The first texture.</param>
+		/// <param name="b">The second texture.</param>
+		/// <returns>False if textures are equal, true if not.</returns>
+		public static bool operator != (Texture a, Texture b)
+		{
+			return !(a == b);
+		}
 
-    public class TextureCollection : Collection<Texture>
-    {
-        /// <summary>
-        /// Add a Texture to this collection if it does not already exist.
-        /// </summary>
-        /// <param name="item"></param>
-        /// <returns></returns>
-        public Guid AddIfNew(Texture item)
-        {
-            var q = from a in this
-                    where a.Equals(item)
-                    select a.Uuid;
+		#endregion
 
-            var enumerable = q as Guid[] ?? q.ToArray();
-            if (!enumerable.Any())
-            {
-                Add(item);
-                return item.Uuid;
-            }
-            else
-            {
-                return enumerable.Single();
-            }
-        }
-    }
-    
+	}	
 }
